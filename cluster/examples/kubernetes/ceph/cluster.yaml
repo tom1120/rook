@@ -134,24 +134,50 @@ spec:
   # To control where various services will be scheduled by kubernetes, use the placement configuration sections below.
   # The example under 'all' would have all services scheduled on kubernetes nodes labeled with 'role=storage-node' and
   # tolerate taints with a key of 'storage-node'.
-#  placement:
-#    all:
-#      nodeAffinity:
-#        requiredDuringSchedulingIgnoredDuringExecution:
-#          nodeSelectorTerms:
-#          - matchExpressions:
-#            - key: role
-#              operator: In
-#              values:
-#              - storage-node
-#      podAffinity:
-#      podAntiAffinity:
-#      topologySpreadConstraints:
-#      tolerations:
-#      - key: storage-node
-#        operator: Exists
+  placement:
+    all:
+      nodeAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+          nodeSelectorTerms:
+          - matchExpressions:
+            - key: role
+              operator: In
+              values:
+              - storage-node
+      # podAffinity:
+      # podAntiAffinity:
+      # topologySpreadConstraints:
+      tolerations:
+      - key: storage-node
+        operator: Exists
 # The above placement information can also be specified for mon, osd, and mgr components
 #    mon:
+#      nodeAffinity:
+#        requiredDuringSchedulingRequiredDuringExecution:
+#          nodeSelectorTerms:
+#          - matchExpressions:
+#            - key: ceph-mon
+#              operator: In
+#              values:
+#              - enabled
+#    osd:
+#      nodeAffinity:
+#        requiredDuringSchedulingRequiredDuringExecution:
+#          nodeSelectorTerms:
+#          - matchExpressions:
+#            - key: ceph-osd
+#              operator: In
+#              values:
+#              - enabled
+#    mgr:
+#      nodeAffinity:
+#        requiredDuringSchedulingRequiredDuringExecution:
+#          nodeSelectorTerms:
+#          - matchExpressions:
+#            - key: ceph-mgr
+#              operator: In
+#              values:
+#              - enabled	       
 # Monitor deployments may contain an anti-affinity rule for avoiding monitor
 # collocation on the same node. This is a required rule when host network is used
 # or when AllowMultiplePerNode is false. Otherwise this anti-affinity rule is a
@@ -229,6 +255,10 @@ spec:
 #      config: # configuration can be specified at the node level which overrides the cluster level config
 #    - name: "172.17.4.301"
 #      deviceFilter: "^sd."
+    #nodes:
+    #- name: "k8s-storage-01"
+    #- name: "k8s-storage-02"
+    #- name: "k8s-storage-03"
   # The section for configuring management of daemon disruptions during upgrade or fencing.
   disruptionManagement:
     # If true, the operator will create and manage PodDisruptionBudgets for OSD, Mon, RGW, and MDS daemons. OSD PDBs are managed dynamically

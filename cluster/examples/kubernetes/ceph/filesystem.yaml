@@ -13,8 +13,8 @@ spec:
   # The metadata pool spec. Must use replication.
   metadataPool:
     replicated:
-      size: 3
-      requireSafeReplicaSize: true
+      size: 1 
+      requireSafeReplicaSize: false
     parameters:
       # Inline compression mode for the data pool
       # Further reference: https://docs.ceph.com/docs/master/rados/configuration/bluestore-config-ref/#inline-compression
@@ -27,10 +27,10 @@ spec:
   dataPools:
     - failureDomain: host
       replicated:
-        size: 3
+        size: 1
         # Disallow setting pool with replica 1, this could lead to data loss without recovery.
         # Make sure you're *ABSOLUTELY CERTAIN* that is what you want
-        requireSafeReplicaSize: true
+        requireSafeReplicaSize: false
       parameters:
         # Inline compression mode for the data pool
         # Further reference: https://docs.ceph.com/docs/master/rados/configuration/bluestore-config-ref/#inline-compression
@@ -50,14 +50,14 @@ spec:
     activeStandby: true
     # The affinity rules to apply to the mds deployment
     placement:
-      #  nodeAffinity:
-      #    requiredDuringSchedulingIgnoredDuringExecution:
-      #      nodeSelectorTerms:
-      #      - matchExpressions:
-      #        - key: role
-      #          operator: In
-      #          values:
-      #          - mds-node
+      nodeAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+          nodeSelectorTerms:
+          - matchExpressions:
+            - key: role
+              operator: In
+              values:
+                - storage-node
       #  topologySpreadConstraints:
       #  tolerations:
       #  - key: mds-node

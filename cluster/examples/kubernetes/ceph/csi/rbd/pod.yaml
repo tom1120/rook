@@ -4,6 +4,8 @@ kind: Pod
 metadata:
   name: csirbd-demo-pod
 spec:
+  nodeSelector:
+    zone: worker
   containers:
     - name: web-server
       image: nginx

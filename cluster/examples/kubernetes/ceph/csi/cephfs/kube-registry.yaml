@@ -61,6 +61,8 @@ spec:
             httpGet:
               path: /
               port: registry
+      nodeSelector:
+        zone: worker
       volumes:
         - name: image-store
           persistentVolumeClaim:

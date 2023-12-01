@@ -79,9 +79,16 @@ data:
   # ROOK_CSI_SNAPSHOTTER_IMAGE: "k8s.gcr.io/sig-storage/csi-snapshotter:v4.1.1"
   # ROOK_CSI_ATTACHER_IMAGE: "k8s.gcr.io/sig-storage/csi-attacher:v3.2.1"
 
+
+  # ROOK_CSI_CEPH_IMAGE: "quay.io/cephcsi/cephcsi:v3.4.0"
+  ROOK_CSI_REGISTRAR_IMAGE: "csiplugin/csi-node-driver-registrar:v2.2.0"
+  ROOK_CSI_RESIZER_IMAGE: "csiplugin/csi-resizer:v1.2.0"
+  ROOK_CSI_PROVISIONER_IMAGE: "csiplugin/csi-provisioner:v2.2.2"
+  ROOK_CSI_SNAPSHOTTER_IMAGE: "csiplugin/csi-snapshotter:v4.0.0"
+  ROOK_CSI_ATTACHER_IMAGE: "csiplugin/csi-attacher:v3.2.1"
+
   # (Optional) set user created priorityclassName for csi plugin pods.
   # CSI_PLUGIN_PRIORITY_CLASSNAME: "system-node-critical"
-
   # (Optional) set user created priorityclassName for csi provisioner pods.
   # CSI_PROVISIONER_PRIORITY_CLASSNAME: "system-cluster-critical"
 
@@ -101,7 +108,8 @@ data:
   # ROOK_CSI_RBD_POD_LABELS: "key1=value1,key2=value2"
 
   # (Optional) CephCSI provisioner NodeAffinity(applied to both CephFS and RBD provisioner).
-  # CSI_PROVISIONER_NODE_AFFINITY: "role=storage-node; storage=rook, ceph"
+  #CSI_PROVISIONER_NODE_AFFINITY: "role=storage-node; storage=rook, ceph"
+  CSI_PROVISIONER_NODE_AFFINITY: "app.rook.role=csi-provisioner"
   # (Optional) CephCSI provisioner tolerations list(applied to both CephFS and RBD provisioner).
   # Put here list of taints you want to tolerate in YAML format.
   # CSI provisioner would be best to start on the same nodes as other ceph daemons.
@@ -114,6 +122,7 @@ data:
   #     operator: Exists
   # (Optional) CephCSI plugin NodeAffinity(applied to both CephFS and RBD plugin).
   # CSI_PLUGIN_NODE_AFFINITY: "role=storage-node; storage=rook, ceph"
+  CSI_PLUGIN_NODE_AFFINITY: "zone=worker"
   # (Optional) CephCSI plugin tolerations list(applied to both CephFS and RBD plugin).
   # Put here list of taints you want to tolerate in YAML format.
   # CSI plugins need to be started on all the nodes where the clients need to mount the storage.
@@ -323,7 +332,7 @@ data:
   ROOK_ENABLE_FLEX_DRIVER: "false"
   # Whether to start the discovery daemon to watch for raw storage devices on nodes in the cluster.
   # This daemon does not need to run if you are only going to create your OSDs based on StorageClassDeviceSets with PVCs.
-  ROOK_ENABLE_DISCOVERY_DAEMON: "false"
+  ROOK_ENABLE_DISCOVERY_DAEMON: "true"
   # The timeout value (in seconds) of Ceph commands. It should be >= 1. If this variable is not set or is an invalid value, it's default to 15.
   ROOK_CEPH_COMMANDS_TIMEOUT_SECONDS: "15"
   # Enable volume replication controller
@@ -434,8 +443,8 @@ spec:
             # - name: DISCOVER_PRIORITY_CLASS_NAME
             #   value: "<PriorityClassName>"
             # (Optional) Discover Agent NodeAffinity.
-            # - name: DISCOVER_AGENT_NODE_AFFINITY
-            #   value: "role=storage-node; storage=rook, ceph"
+            - name: DISCOVER_AGENT_NODE_AFFINITY
+              value: "app.rook=storage"
             # (Optional) Discover Agent Pod Labels.
             # - name: DISCOVER_AGENT_POD_LABELS
             #   value: "key1=value1,key2=value2"
@@ -514,7 +523,8 @@ spec:
           #  Uncomment it to run lib bucket provisioner in multithreaded mode
           #- name: LIB_BUCKET_PROVISIONER_THREADS
           #  value: "5"
-
+      nodeSelector:
+        cephOperator: enabled
       # Uncomment it to run rook operator on the host network
       #hostNetwork: true
       volumes:
